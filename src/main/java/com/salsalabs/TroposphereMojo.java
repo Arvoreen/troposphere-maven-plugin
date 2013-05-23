@@ -15,6 +15,12 @@ package com.salsalabs;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ * Much code originally from jython-compile-maven-plugin project @ http://sourceforge.net/p/mavenjython/ 
+ * Original author Johannes Buchner
+ * 
+ * Modified by Eduard Martinescu
+ */
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,7 +52,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 @Mojo(name = "tropo", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE)
-public class MyMojo extends AbstractMojo {
+public class TroposphereMojo extends AbstractMojo {
   private static final String SETUPTOOLS_EGG = "setuptools-0.6c11-py2.5.egg";
 
   private Artifact jythonArtifact;
