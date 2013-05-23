@@ -313,7 +313,13 @@ public class MyMojo extends AbstractMojo {
         return i;
       }
     }
-    throw new MojoExecutionException("org.python.jython-standalone dependency not found. " + "\n" + "Add a dependency to jython-standalone to your project: \n" + " <dependency>\n" + "   <groupId>org.python</groupId>\n" + "   <artifactId>jython-standalone</artifactId>\n" + "   <version>2.5.2</version>\n" + " </dependency>" + "\n");
+    throw new MojoExecutionException("org.python.jython-standalone dependency not found. \n" + 
+                                     "Add a dependency to jython-standalone 2.7-b1 or newer to your project: \n" + 
+                                     " <dependency>\n" + 
+                                     "   <groupId>org.python</groupId>\n" + 
+                                     "   <artifactId>jython-standalone</artifactId>\n" + 
+                                     "   <version>2.7-b1</version>\n" + 
+                                     " </dependency>" + "\n");
   }
 
   public Collection<File> extractJarToDirectory(File jar, File outputDirectory) throws MojoExecutionException {
