@@ -16,12 +16,14 @@ package com.salsalabs;
  * limitations under the License.
  */
 /*
- * Much code originally from jython-compile-maven-plugin project @ http://sourceforge.net/p/mavenjython/ 
+ * Much code originally from jython-compile-maven-plugin project @
+ * http://sourceforge.net/p/mavenjython/
  * Original author Johannes Buchner
  * 
  * Modified by Eduard Martinescu
  */
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -81,7 +83,7 @@ public class TroposphereMojo extends AbstractMojo {
    * compiling and packaging.
    * 
    */
-  @Parameter(defaultValue = "${project.build.directory}/generated-sources/troposphere", property = "outputDirectory")
+  @Parameter(defaultValue = "${basedir}/src/cloud-templates", property = "outputDirectory")
   private File outputDirectory;
 
   /**
@@ -111,6 +113,13 @@ public class TroposphereMojo extends AbstractMojo {
   @Parameter
   private String[] excludes;
 
+  /**
+   * Libraries needed to include.
+   * 
+   */
+  @Parameter(property="libs")
+  private List<String> libs;
+
   @Component
   private MavenProject project;
 
@@ -138,15 +147,6 @@ public class TroposphereMojo extends AbstractMojo {
    * Lib/
    */
   private File libdir;
-
-  /**
-   * Libraries needed to include.
-   * 
-   * @parameter
-   * @optional
-   */
-  @Parameter(defaultValue = "boto,troposphere")
-  private List<String> libraries;
 
   /**
    * Should we override files during extraction if they already exist?
@@ -180,6 +180,10 @@ public class TroposphereMojo extends AbstractMojo {
     return this.sourceDirectory;
   }
 
+  protected List<String> getLibraries() {
+    return this.libs;
+  }
+
   public void execute() throws MojoExecutionException {
     File sourceDirectory = getSourceDirectory();
     getLog().debug("source=" + sourceDirectory + " target=" + getOutputDirectory());
@@ -198,7 +202,7 @@ public class TroposphereMojo extends AbstractMojo {
 
     // now what? we have the jython content, now we need
     // easy_install
-    getLog().info("installing easy_install ...");
+    getLog().debug("installing easy_install ...");
     try {
       FileUtils.copyInputStreamToFile(setuptoolsResource.openStream(), setuptoolsJar);
     }
@@ -212,16 +216,16 @@ public class TroposphereMojo extends AbstractMojo {
     catch (IOException e) {
       throw new MojoExecutionException("writing path entry for setuptools failed", e);
     }
-    getLog().info("installing easy_install done");
-    if (libraries == null) {
+    getLog().debug("installing easy_install done");
+    if (libs == null) {
       getLog().info("no python libraries requested");
     }
     else {
-      getLog().info("installing requested python libraries");
+      getLog().debug("installing requested python libraries");
       // then we need to call easy_install to install the other
       // dependencies.
-      runJythonScriptOnInstall(temporaryBuildDirectory, getEasyInstallArgs("Lib/site-packages/" + SETUPTOOLS_EGG + "/easy_install.py"),null);
-      getLog().info("installing requested python libraries done");
+      runJythonScriptOnInstall(temporaryBuildDirectory, getEasyInstallArgs("Lib/site-packages/" + SETUPTOOLS_EGG + "/easy_install.py"), null);
+      getLog().debug("installing requested python libraries done");
     }
 
     processFiles();
@@ -241,12 +245,12 @@ public class TroposphereMojo extends AbstractMojo {
     String[] files = ds.getIncludedFiles();
     for (String file : files) {
       getLog().info("Processing file: " + file);
-      File fullFile = new File(sourceDirectory,file);
+      File fullFile = new File(sourceDirectory, file);
       String destFile = file;
       if (FilenameUtils.indexOfExtension(file) > -1) {
-        destFile = file.substring(0, FilenameUtils.indexOfExtension(file))+".template";
+        destFile = file.substring(0, FilenameUtils.indexOfExtension(file)) + ".template";
       }
-      runJythonScriptOnInstall(temporaryBuildDirectory, getPythonArgs(fullFile.getAbsolutePath()),new File(outputDirectory,destFile));
+      runJythonScriptOnInstall(temporaryBuildDirectory, getPythonArgs(fullFile.getAbsolutePath()), new File(outputDirectory, destFile));
     }
   }
 
@@ -274,17 +278,12 @@ public class TroposphereMojo extends AbstractMojo {
     }
     args.add("-Dpython.executable=" + jythonFakeExecutable.getName());
     args.add("org.python.util.jython");
-    // and it should run easy_install
+    // and it should run the supplied file
     args.add(file);
-    // with some arguments
-    // args.add("--optimize");
-    // args.add("--install-dir");
-    // args.add(outputDirectory.getAbsolutePath());
-    // and cache here
     args.add("--build-directory");
     args.add(packageDownloadCacheDir.getAbsolutePath());
     // and install these libraries
-    args.addAll(libraries);
+    args.addAll(libs);
 
     return args;
   }
@@ -307,6 +306,19 @@ public class TroposphereMojo extends AbstractMojo {
       throw new MojoExecutionException("resource setuptools egg not found");
     setuptoolsJar = new File(packageDownloadCacheDir, SETUPTOOLS_EGG);
     sitepackagesdir = new File(libdir, "site-packages");
+
+    if (libs == null) {
+      getLog().info("libraries list empty");
+      libs = new ArrayList<String>();
+    }
+    if (!libs.contains("boto")) {
+      getLog().info("missing boto library, adding automatically");
+      libs.add("boto");
+    }
+    if (!libs.contains("troposphere")) {
+      getLog().info("missing troposphere library, adding automatically");
+      libs.add("troposphere");
+    }
   }
 
   /**
@@ -319,17 +331,11 @@ public class TroposphereMojo extends AbstractMojo {
         return i;
       }
     }
-    throw new MojoExecutionException("org.python.jython-standalone dependency not found. \n" + 
-                                     "Add a dependency to jython-standalone 2.7-b1 or newer to your project: \n" + 
-                                     " <dependency>\n" + 
-                                     "   <groupId>org.python</groupId>\n" + 
-                                     "   <artifactId>jython-standalone</artifactId>\n" + 
-                                     "   <version>2.7-b1</version>\n" + 
-                                     " </dependency>" + "\n");
+    throw new MojoExecutionException("org.python.jython-standalone dependency not found. \n" + "Add a dependency to jython-standalone 2.7-b1 or newer to your project: \n" + " <dependency>\n" + "   <groupId>org.python</groupId>\n" + "   <artifactId>jython-standalone</artifactId>\n" + "   <version>2.7-b1</version>\n" + " </dependency>" + "\n");
   }
 
   public Collection<File> extractJarToDirectory(File jar, File outputDirectory) throws MojoExecutionException {
-    getLog().info("extracting " + jar);
+    getLog().debug("extracting " + jar);
     JarFile ja = openJarFile(jar);
     Enumeration<JarEntry> en = ja.entries();
     Collection<File> files = extractAllFiles(outputDirectory, ja, en);
@@ -359,10 +365,8 @@ public class TroposphereMojo extends AbstractMojo {
     List<File> files = new ArrayList<File>();
     while (en.hasMoreElements()) {
       JarEntry el = en.nextElement();
-      // getLog().info(" > " + el);
       if (!el.isDirectory()) {
         File destFile = new File(outputDirectory, el.getName());
-        // destFile = new File(outputDirectory, destFile.getName());
         if (OVERRIDE || !destFile.exists()) {
           destFile.getParentFile().mkdirs();
           try {
@@ -399,17 +403,11 @@ public class TroposphereMojo extends AbstractMojo {
     }
     args.add("-Dpython.executable=" + jythonFakeExecutable.getName());
     args.add("org.python.util.jython");
-    // and it should run easy_install
     args.add(easy_install_script);
-    // with some arguments
-    // args.add("--optimize");
-    // args.add("--install-dir");
-    // args.add(outputDirectory.getAbsolutePath());
-    // and cache here
     args.add("--build-directory");
     args.add(packageDownloadCacheDir.getAbsolutePath());
     // and install these libraries
-    args.addAll(libraries);
+    args.addAll(libs);
 
     return args;
   }
@@ -426,6 +424,8 @@ public class TroposphereMojo extends AbstractMojo {
     ProcessBuilder pb = new ProcessBuilder(args);
     pb.directory(outputDirectory);
     final Process p;
+    ByteArrayOutputStream stdoutBaos = null;
+    ByteArrayOutputStream stderrBaos = null;
     try {
       p = pb.start();
     }
@@ -433,21 +433,32 @@ public class TroposphereMojo extends AbstractMojo {
       throw new MojoExecutionException("Executing jython failed. tried to run: " + pb.command(), e);
     }
     if (outputFile == null) {
-      copyIO(p.getInputStream(), System.out);
+      stdoutBaos = new ByteArrayOutputStream();
+      copyIO(p.getInputStream(), stdoutBaos);
     }
-    else
-    {
+    else {
       try {
-        copyIO(p.getInputStream(),new FileOutputStream(outputFile));
+        copyIO(p.getInputStream(), new FileOutputStream(outputFile));
       }
       catch (FileNotFoundException e) {
-          throw new MojoExecutionException("Failed to copy output to : " + outputFile.getAbsolutePath(),e);
+        throw new MojoExecutionException("Failed to copy output to : " + outputFile.getAbsolutePath(), e);
       }
     }
-    copyIO(p.getErrorStream(), System.err);
+    stderrBaos = new ByteArrayOutputStream();
+    copyIO(p.getErrorStream(), stderrBaos);
     copyIO(System.in, p.getOutputStream());
     try {
+      boolean error = false;
       if (p.waitFor() != 0) {
+        error = true;
+      }
+      if (getLog().isDebugEnabled() && stdoutBaos != null) {
+        getLog().debug(stdoutBaos.toString());
+      }
+      if (getLog().isErrorEnabled() && stderrBaos != null) {
+        getLog().error(stderrBaos.toString());
+      }
+      if (error) {
         throw new MojoExecutionException("Jython failed with return code: " + p.exitValue());
       }
     }

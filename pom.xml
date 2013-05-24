@@ -4,7 +4,7 @@
 
   <groupId>com.salsalabs</groupId>
   <artifactId>troposphere-maven-plugin</artifactId>
-  <version>0.8</version>
+  <version>0.8.1</version>
   <packaging>maven-plugin</packaging>
 
   <name>troposphere-maven-plugin Maven Plugin</name>
@@ -113,4 +113,36 @@
       </build>
     </profile>
   </profiles>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>salsa</id>
+      <name>Salsa Repository</name>
+      <url>https://artifactory.salsalabs.net/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>salsa-snap</id>
+      <name>Salsa Snapshots</name>
+      <url>https://artifactory.salsalabs.net/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <scm>
+    <url>https://git.salsalabs.net/</url>
+    <connection>scm:git:https://git.salsalabs.net</connection>
+    <developerConnection>scm:git:https://git.salsalabs.net</developerConnection>
+    <tag>master</tag>
+  </scm>
+  <organization>
+    <name>SalsaLabs</name>
+    <url>http://www.salsalabs.com</url>
+  </organization>
+  <issueManagement>
+    <system>FogBugz</system>
+    <url>https://bugs.salsalabs.com/fogbugz/</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://jenkins.salsalabs.net/</url>
+  </ciManagement>
 </project>

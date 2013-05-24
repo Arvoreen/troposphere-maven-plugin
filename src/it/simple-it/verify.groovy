@@ -1,3 +1,3 @@
-File touchFile = new File( basedir, "target/generated-sources/troposphere/test.template" );
+File touchFile = new File( basedir, "src/cloud-templates/test.template" );
 
 assert touchFile.isFile()
