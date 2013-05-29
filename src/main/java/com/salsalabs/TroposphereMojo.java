@@ -55,7 +55,9 @@ import org.codehaus.plexus.util.DirectoryScanner;
 
 @Mojo(name = "tropo", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class TroposphereMojo extends AbstractMojo {
-  private static final String SETUPTOOLS_EGG = "setuptools-0.6c11-py2.5.egg";
+  private static final String SETUPTOOLS_EGG = "setuptools-0.6c11-py2.7.egg";
+  private static final String BOTO_EGG = "boto-2.9.4-py2.7.egg";
+  private static final String TROPO_EGG = "troposphere-0.2.9-py2.7.egg";
 
   private Artifact jythonArtifact;
 
@@ -134,6 +136,18 @@ public class TroposphereMojo extends AbstractMojo {
   private File setuptoolsJar;
 
   /**
+   * URL & File to copy boto egg from within plugin
+   */
+  private URL botoURL;
+  private File botoFile;
+  
+  /**
+   * URL & File to copy troposphere egg
+   */
+  private URL tropoURL;
+  private File tropoFile;
+  
+  /**
    * Lib/site-packages
    */
   private File sitepackagesdir;
@@ -209,6 +223,18 @@ public class TroposphereMojo extends AbstractMojo {
     catch (IOException e) {
       throw new MojoExecutionException("copying setuptools failed", e);
     }
+    try {
+      FileUtils.copyInputStreamToFile(botoURL.openStream(), botoFile);
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException("copying setuptools failed", e);
+    }
+    try {
+      FileUtils.copyInputStreamToFile(tropoURL.openStream(), tropoFile);
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException("copying setuptools failed", e);
+    }
     extractJarToDirectory(setuptoolsJar, new File(sitepackagesdir, SETUPTOOLS_EGG));
     try {
       IOUtils.write("./" + SETUPTOOLS_EGG + "\n", new FileOutputStream(new File(sitepackagesdir, "setuptools.pth")));
@@ -280,10 +306,6 @@ public class TroposphereMojo extends AbstractMojo {
     args.add("org.python.util.jython");
     // and it should run the supplied file
     args.add(file);
-    args.add("--build-directory");
-    args.add(packageDownloadCacheDir.getAbsolutePath());
-    // and install these libraries
-    args.addAll(libs);
 
     return args;
   }
@@ -307,17 +329,23 @@ public class TroposphereMojo extends AbstractMojo {
     setuptoolsJar = new File(packageDownloadCacheDir, SETUPTOOLS_EGG);
     sitepackagesdir = new File(libdir, "site-packages");
 
+    botoURL = getClass().getResource(BOTO_EGG);
+    botoFile = new File(packageDownloadCacheDir,BOTO_EGG);
+    
+    tropoURL = getClass().getResource(TROPO_EGG);
+    tropoFile = new File(packageDownloadCacheDir,TROPO_EGG);
+    
     if (libs == null) {
       getLog().info("libraries list empty");
       libs = new ArrayList<String>();
     }
     if (!libs.contains("boto")) {
       getLog().info("missing boto library, adding automatically");
-      libs.add("boto");
+      libs.add(botoFile.getAbsolutePath());
     }
     if (!libs.contains("troposphere")) {
       getLog().info("missing troposphere library, adding automatically");
-      libs.add("troposphere");
+      libs.add(tropoFile.getAbsolutePath());
     }
   }
 
@@ -394,6 +422,7 @@ public class TroposphereMojo extends AbstractMojo {
     args.add("." + getClassPathSeparator() + "Lib");
     // which should know about itself
     args.add("-Dpython.home=.");
+    //args.add("-Dpython.verbose=debug");
     File jythonFakeExecutable = new File(temporaryBuildDirectory, "jython");
     try {
       jythonFakeExecutable.createNewFile();
@@ -404,6 +433,9 @@ public class TroposphereMojo extends AbstractMojo {
     args.add("-Dpython.executable=" + jythonFakeExecutable.getName());
     args.add("org.python.util.jython");
     args.add(easy_install_script);
+    args.add("--always-unzip");
+    args.add("--upgrade");
+    args.add("--verbose");
     args.add("--build-directory");
     args.add(packageDownloadCacheDir.getAbsolutePath());
     // and install these libraries
@@ -423,6 +455,7 @@ public class TroposphereMojo extends AbstractMojo {
     getLog().info("running " + args + " in " + outputDirectory);
     ProcessBuilder pb = new ProcessBuilder(args);
     pb.directory(outputDirectory);
+    pb.environment().put("BASEDIR", project.getBasedir().getAbsolutePath());
     final Process p;
     ByteArrayOutputStream stdoutBaos = null;
     ByteArrayOutputStream stderrBaos = null;
