@@ -1,16 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.salsalabs</groupId>
+  <groupId>com.arvoreen.maven</groupId>
   <artifactId>troposphere-maven-plugin</artifactId>
-  <version>0.8.2</version>
+  <version>0.8.8</version>
   <packaging>maven-plugin</packaging>
 
   <name>troposphere-maven-plugin Maven Plugin</name>
-
-  <!-- FIXME change it to the project's website -->
-  <url>http://maven.apache.org</url>
-
+  <description>This plugin makes use of Jython and 2 Pthyon modules (Boto and Troposphere) to allow for automated
+  generation of AWS CloudFormation templates from a Python source file.  This alleviates the need to maintain a large
+  and possibly cumbersome JSON file by hand, and allows for proper commenting, modularization, etc.
+  </description>
+  <url>https://github.com/Arvoreen/troposphere-maven-plugin</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>Ed</id>
+      <name>Eduard Martinescu</name>
+    </developer>
+  </developers>
+  <scm>
+    <url>scm:git://github.com/Arvoreen/troposphere-maven-plugin.git</url>
+    <developerConnection>scm:git@github.com:Arvoreen/troposphere-maven-plugin.git</developerConnection>
+    <tag>master</tag>
+  </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -80,13 +100,17 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.4.1</version>
+      </plugin>
     </plugins>
   </build>
   <profiles>
     <profile>
       <id>run-its</id>
       <build>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -113,40 +137,34 @@
             </executions>
           </plugin>
         </plugins>
-
+      </build>
+    </profile>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>salsa</id>
-      <name>Salsa Repository</name>
-      <url>https://artifactory.salsalabs.net/artifactory/libs-release-local</url>
-    </repository>
-    <snapshotRepository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>salsa-snap</id>
-      <name>Salsa Snapshots</name>
-      <url>https://artifactory.salsalabs.net/artifactory/libs-snapshot-local</url>
-    </snapshotRepository>
-  </distributionManagement>
-  <scm>
-    <url>https://git.salsalabs.net/</url>
-    <connection>scm:git:https://git.salsalabs.net</connection>
-    <developerConnection>scm:git:https://git.salsalabs.net</developerConnection>
-    <tag>master</tag>
-  </scm>
-  <organization>
-    <name>SalsaLabs</name>
-    <url>http://www.salsalabs.com</url>
-  </organization>
-  <issueManagement>
-    <system>FogBugz</system>
-    <url>https://bugs.salsalabs.com/fogbugz/</url>
-  </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://jenkins.salsalabs.net/</url>
-  </ciManagement>
 </project>
