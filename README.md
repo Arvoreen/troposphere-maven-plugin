@@ -5,38 +5,33 @@ Usage is pretty easy
 
 Include the following in your  pom.xml
 
-```
-   <build>
-    <plugins>
-      <plugin>
-        <groupId>com.salsalabs</groupId>
-        <artifactId>troposphere-maven-plugin</artifactId>
-        <version>0.8.2</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>tropo</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-```
+     <build>
+      <plugins>
+        <plugin>
+          <groupId>com.salsalabs</groupId>
+          <artifactId>troposphere-maven-plugin</artifactId>
+          <version>0.8.2</version>
+          <executions>
+            <execution>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>tropo</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
 
 You also need to include a dependency in your project to the Jython artifact
 
-```
- <dependencies>
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
-      <version>2.7-b1</version>
-    </dependency>
-  </dependencies>
-```
+    <dependencies>
+      <dependency>
+        <groupId>org.python</groupId>
+        <artifactId>jython-standalone</artifactId>
+        <version>2.7-b1</version>
+      </dependency>
+    </dependencies>
 
 Note that version 2.7-b1 or newer is required.
 
@@ -51,3 +46,4 @@ For some examples, checkout the 'src/it' directory
 [AWS CloudFormation]: http://aws.amazon.com/cloudformation
 [Boto]: https://github.com/boto/boto
 [Troposphere]: https://github.com/cloudtools/troposphere
+[Jython]: http://www.jython.org/
