@@ -9,7 +9,7 @@
 
   <groupId>com.azurenight.maven</groupId>
   <artifactId>troposphere-maven-plugin</artifactId>
-  <version>0.8.8-SNAPSHOT</version>
+  <version>0.8.8</version>
   <packaging>maven-plugin</packaging>
 
   <name>troposphere-maven-plugin Maven Plugin</name>
@@ -35,7 +35,7 @@
   <scm>
     <url>scm:git://github.com/Arvoreen/troposphere-maven-plugin.git</url>
     <developerConnection>scm:git:git@github.com:Arvoreen/troposphere-maven-plugin.git</developerConnection>
-    <tag>master</tag>
+    <tag>troposphere-maven-plugin-0.8.8</tag>
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
