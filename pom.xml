@@ -34,7 +34,7 @@
   </developers>
   <scm>
     <url>scm:git://github.com/Arvoreen/troposphere-maven-plugin.git</url>
-    <developerConnection>scm:git@github.com:Arvoreen/troposphere-maven-plugin.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:Arvoreen/troposphere-maven-plugin.git</developerConnection>
     <tag>master</tag>
   </scm>
   <properties>
