@@ -1,4 +1,4 @@
-package com.arvoreen.maven;
+package com.azurenight.maven;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.

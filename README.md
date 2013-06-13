@@ -8,7 +8,7 @@ Include the following in your  pom.xml
      <build>
       <plugins>
         <plugin>
-          <groupId>com.arvoreen.maven</groupId>
+          <groupId>com.azurenight.maven</groupId>
           <artifactId>troposphere-maven-plugin</artifactId>
           <version>0.8.2</version>
           <executions>
