@@ -57,7 +57,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 public class TroposphereMojo extends AbstractMojo {
   private static final String SETUPTOOLS_EGG = "setuptools-0.6c11-py2.7.egg";
   private static final String BOTO_EGG = "boto-2.9.4-py2.7.egg";
-  private static final String TROPO_EGG = "troposphere-0.2.9-py2.7.egg";
+  private static final String TROPO_EGG = "troposphere-0.3.4-py2.7.egg";
 
   private Artifact jythonArtifact;
 
