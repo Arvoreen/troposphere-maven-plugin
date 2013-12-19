@@ -27,7 +27,7 @@
         <version>@project.version@</version>
         <configuration>
           <libs>
-            <lib>testpackage</lib>
+            <lib></lib>
           </libs>
         </configuration>
         <executions>

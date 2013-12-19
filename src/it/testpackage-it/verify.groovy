@@ -1,3 +1,7 @@
-File myFile = new File( basedir, "target/troposphere-build-tmp/build/testpackage" );
+File touchFile = new File( basedir, "src/cloud-templates/test.template" );
 
-assert myFile.isDirectory()
+assert touchFile.isFile()
+
+touchFile = new File( basedir, "src/cloud-templates/exclude.template" );
+
+assert touchFile.isFile()

@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -57,7 +58,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 public class TroposphereMojo extends AbstractMojo {
   private static final String SETUPTOOLS_EGG = "setuptools-0.6c11-py2.7.egg";
   private static final String BOTO_EGG = "boto-2.9.4-py2.7.egg";
-  private static final String TROPO_EGG = "troposphere-0.3.4-py2.7.egg";
+  private static final String TROPO_EGG = "troposphere-0.3.4.1-py2.7.egg";
 
   private Artifact jythonArtifact;
 
@@ -247,7 +248,14 @@ public class TroposphereMojo extends AbstractMojo {
       throw new MojoExecutionException("writing path entry for setuptools failed", e);
     }
     getLog().debug("installing easy_install done");
-    if (libs == null) {
+    Iterator<String> it = libs.iterator();
+    while (it.hasNext()) {
+      String s = it.next();
+      if (s == null || s.length() == 0) {
+        it.remove();
+      }
+    }
+    if (libs == null || libs.size() == 0) {
       getLog().info("no python libraries requested");
     }
     else {
