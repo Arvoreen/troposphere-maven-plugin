@@ -9,7 +9,7 @@
 
   <groupId>com.azurenight.maven</groupId>
   <artifactId>troposphere-maven-plugin</artifactId>
-  <version>0.8.11-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>troposphere-maven-plugin Maven Plugin</name>
