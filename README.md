@@ -10,7 +10,7 @@ Include the following in your  pom.xml
         <plugin>
           <groupId>com.azurenight.maven</groupId>
           <artifactId>troposphere-maven-plugin</artifactId>
-          <version>0.8.8</version>
+          <version>1.0.0</version>
           <executions>
             <execution>
               <phase>generate-sources</phase>
