@@ -47,3 +47,5 @@ For some examples, checkout the 'src/it' directory
 [Boto]: https://github.com/boto/boto
 [Troposphere]: https://github.com/cloudtools/troposphere
 [Jython]: http://www.jython.org/
+
+NOTE: As of release 2.3.0, the maven-troposphere-plugin will follow the troposphere release numbering (version 2.3.0 of plugin includes version 2.3.0 of troposphere, etc.)
