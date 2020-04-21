@@ -14,8 +14,8 @@
   <dependencies>
     <dependency>
       <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
-      <version>2.7-b1</version>
+      <artifactId>jython-installer</artifactId>
+      <version>2.7.2</version>
     </dependency>
 
   </dependencies>

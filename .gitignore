@@ -3,3 +3,5 @@
 .DS_Store
 /logs
 release.properties
+troposphere-maven-plugin.iml
+.idea/

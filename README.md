@@ -23,17 +23,18 @@ Include the following in your  pom.xml
       </plugins>
     </build>
 
-You also need to include a dependency in your project to the Jython artifact
+You also need to include a dependency in your project to the Jython Installer artifact
 
     <dependencies>
       <dependency>
         <groupId>org.python</groupId>
-        <artifactId>jython-standalone</artifactId>
-        <version>2.7-b1</version>
+        <artifactId>jython-installer</artifactId>
+        <version>2.7.2</version>
       </dependency>
     </dependencies>
 
-Note that version 2.7-b1 or newer is required.
+Note that version 2.7.2 or newer is required. The installer will be executed into a tempory build directory, and all required python libraries will be installed there also,
+keeping any **python** installations clean.
 
 This plugin will operate during the generate-sources phase of the Maven lifecycle.  It will scan your source directory (default: src/main/tropopsophere) for
 files with a '.tr' extension.  It will process each file via Jython, with both Boto and Troposphere modules loaded by default (you can add additional modules if you need them)
@@ -49,3 +50,5 @@ For some examples, checkout the 'src/it' directory
 [Jython]: http://www.jython.org/
 
 NOTE: As of release 2.3.0, the maven-troposphere-plugin will follow the troposphere release numbering (version 2.3.0 of plugin includes version 2.3.0 of troposphere, etc.)
+
+UPDATE: With release 2.6.0, the Jython requirement has switched from the jython-standalone package to the jython-installer. Please update your project POM file appropriately
