@@ -47,7 +47,6 @@ public class TroposphereMojo extends AbstractMojo {
   /**
    * Caching directory to download and build python packages, as well as
    * extracted jython dir
-   *
    */
   @Parameter(defaultValue = "target/troposphere-build-tmp", property = "tempDirectory")
   private File temporaryBuildDirectory;
@@ -69,7 +68,6 @@ public class TroposphereMojo extends AbstractMojo {
    * compile source root of the project such that the generated files will
    * participate in later build phases like
    * compiling and packaging.
-   *
    */
   @Parameter(defaultValue = "${basedir}/src/cloud-templates", property = "outputDirectory")
   private File outputDirectory;
@@ -77,7 +75,6 @@ public class TroposphereMojo extends AbstractMojo {
   /**
    * The granularity in milliseconds of the last modification date for testing
    * whether a source needs recompilation.
-   *
    */
   @Parameter(property = "lastModGranularityMs", defaultValue = "0")
   private int staleMillis;
@@ -87,7 +84,6 @@ public class TroposphereMojo extends AbstractMojo {
    * directory for processing. By default,
    * the patterns <code>**&#47;*.tr</code> and <code>**&#47;*.TR</code> are used
    * to select troposphere files.
-   *
    */
   @Parameter
   private String[] includes;
@@ -96,7 +92,6 @@ public class TroposphereMojo extends AbstractMojo {
    * A set of Ant-like exclusion patterns used to prevent certain files from
    * being processed. By default, this set is
    * empty such that no files are excluded.
-   *
    */
   @Parameter
   private String[] excludes;
@@ -104,9 +99,8 @@ public class TroposphereMojo extends AbstractMojo {
   /**
    * List of other Python modules that need to be installed prior to processing of your '.tr' files
    * Installation via easy install/setup tools
-   *
    */
-  @Parameter(property="libs")
+  @Parameter(property = "libs")
   private List<String> libs;
 
   @Component
@@ -125,13 +119,13 @@ public class TroposphereMojo extends AbstractMojo {
   /**
    * URL & File to copy boto egg from within plugin
    */
-  private URL botoURL;
+  private URL  botoURL;
   private File botoFile;
 
   /**
    * URL & File to copy troposphere egg
    */
-  private URL tropoURL;
+  private URL  tropoURL;
   private File tropoFile;
 
   /**
@@ -151,7 +145,7 @@ public class TroposphereMojo extends AbstractMojo {
 
   /**
    * Should we override files during extraction if they already exist?
-   *
+   * <p>
    * if true: will never work on tainted files; if false: will be faster.
    */
   private static final boolean OVERRIDE = false;
@@ -200,7 +194,10 @@ public class TroposphereMojo extends AbstractMojo {
     setupVariables();
 
     // install the jython package
-    runJythonScriptOnInstall(outputDirectory,getJythonInstallArgs(jythonArtifact.getFile().getAbsolutePath()),null);
+    File jythonInstall = new File(temporaryBuildDirectory, "jython");
+    if (!jythonInstall.exists() || !jythonInstall.isDirectory()) {
+      runJythonScriptOnInstall(temporaryBuildDirectory, getJythonInstallArgs(jythonArtifact.getFile().getAbsolutePath()), null);
+    }
 
     Iterator<String> it = libs.iterator();
     while (it.hasNext()) {
@@ -225,7 +222,6 @@ public class TroposphereMojo extends AbstractMojo {
 
   /**
    * @throws MojoExecutionException
-   *
    */
   private void processFiles() throws MojoExecutionException {
     DirectoryScanner ds = new DirectoryScanner();
@@ -237,7 +233,7 @@ public class TroposphereMojo extends AbstractMojo {
     String[] files = ds.getIncludedFiles();
     for (String file : files) {
       getLog().info("Processing file: " + file);
-      File fullFile = new File(sourceDirectory, file);
+      File   fullFile = new File(sourceDirectory, file);
       String destFile = file;
       if (FilenameUtils.indexOfExtension(file) > -1) {
         destFile = file.substring(0, FilenameUtils.indexOfExtension(file)) + ".template";
@@ -258,21 +254,22 @@ public class TroposphereMojo extends AbstractMojo {
     args.add("-i");
     args.add("ensurepip"); // install setuptools
     args.add("-d");
-    args.add(temporaryBuildDirectory.getAbsolutePath()+"/jython"); // install to our temporary build directory
+    args.add(temporaryBuildDirectory.getAbsolutePath() + "/jython"); // install to our temporary build directory
     return args;
   }
 
-
   /**
    * @param file
+   *
    * @return
+   *
    * @throws MojoExecutionException
    */
   private List<String> getPythonArgs(String file) throws MojoExecutionException {
     List<String> args = new ArrayList<>();
 
     // I want to launch
-    args.add(temporaryBuildDirectory.getAbsolutePath()+"/jython/bin/jython");
+    args.add(temporaryBuildDirectory.getAbsolutePath() + "/jython/bin/jython");
     args.add(file);
 
     return args;
@@ -311,6 +308,7 @@ public class TroposphereMojo extends AbstractMojo {
 
   /**
    * @return
+   *
    * @throws MojoExecutionException
    */
   private Artifact findJythonArtifact() throws MojoExecutionException {
@@ -319,14 +317,21 @@ public class TroposphereMojo extends AbstractMojo {
         return i;
       }
     }
-    throw new MojoExecutionException("org.python.jython-installer dependency not found. \n" + "Add a dependency to jython-installer 2.7-b1 or newer to your project: \n" + " <dependency>\n" + "   <groupId>org.python</groupId>\n" + "   <artifactId>jython-standalone</artifactId>\n" + "   <version>2.7-b1</version>\n" + " </dependency>" + "\n");
+    throw new MojoExecutionException("org.python.jython-installer dependency not found. \n" +
+                                     "Add a dependency to jython-installer 2.7-b1 or newer to your project: \n" +
+                                     " <dependency>\n" +
+                                     "   <groupId>org.python</groupId>\n" +
+                                     "   <artifactId>jython-standalone</artifactId>\n" +
+                                     "   <version>2.7-b1</version>\n" +
+                                     " </dependency>" +
+                                     "\n");
   }
 
   public Collection<File> extractJarToDirectory(File jar, File outputDirectory) throws MojoExecutionException {
     getLog().debug("extracting " + jar);
-    JarFile ja = openJarFile(jar);
-    Enumeration<JarEntry> en = ja.entries();
-    Collection<File> files = extractAllFiles(outputDirectory, ja, en);
+    JarFile               ja    = openJarFile(jar);
+    Enumeration<JarEntry> en    = ja.entries();
+    Collection<File>      files = extractAllFiles(outputDirectory, ja, en);
     closeFile(ja);
     return files;
   }
@@ -345,7 +350,7 @@ public class TroposphereMojo extends AbstractMojo {
       ja.close();
     }
     catch (IOException e) {
-      throw new MojoExecutionException("closing jython artifact jar failed : "+ja.getName(), e);
+      throw new MojoExecutionException("closing jython artifact jar failed : " + ja.getName(), e);
     }
   }
 
@@ -363,7 +368,7 @@ public class TroposphereMojo extends AbstractMojo {
             fo.close();
           }
           catch (IOException e) {
-            throw new MojoExecutionException("extracting " + el.getName() + " from jython artifact jar failed "+ja.getName(), e);
+            throw new MojoExecutionException("extracting " + el.getName() + " from jython artifact jar failed " + ja.getName(), e);
           }
         }
         files.add(destFile);
@@ -387,10 +392,8 @@ public class TroposphereMojo extends AbstractMojo {
   }
 
   private String getClassPathSeparator() {
-    if (File.separatorChar == '\\')
-      return ";";
-    else
-      return ":";
+    if (File.separatorChar == '\\') { return ";"; }
+    else { return ":"; }
   }
 
   public void runJythonScriptOnInstall(File outputDirectory, List<String> args, File outputFile) throws MojoExecutionException {
@@ -398,7 +401,7 @@ public class TroposphereMojo extends AbstractMojo {
     ProcessBuilder pb = new ProcessBuilder(args);
     pb.directory(outputDirectory);
     pb.environment().put("BASEDIR", project.getBasedir().getAbsolutePath());
-    final Process p;
+    final Process         p;
     ByteArrayOutputStream stdoutBaos = null;
     ByteArrayOutputStream stderrBaos = null;
     try {
